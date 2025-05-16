@@ -194,3 +194,22 @@ Good luck, Agent GPT-4-1 … the BitNet awaits!
 [8]: https://github.com/microsoft/BitNet/issues/100?utm_source=chatgpt.com "Can't build on Windows 11 · Issue #100 · microsoft/BitNet - GitHub"
 [9]: https://huggingface.co/microsoft/bitnet-b1.58-2B-4T-gguf?utm_source=chatgpt.com "microsoft/bitnet-b1.58-2B-4T-gguf - Hugging Face"
 [10]: https://huggingface.co/QuantFactory/bitnet_b1_58-3B-GGUF?utm_source=chatgpt.com "QuantFactory/bitnet_b1_58-3B-GGUF - Hugging Face"
+
+---
+
+## 🛠️ **Setup Instructions**
+
+1. **Run the `setup-bitnet.ps1` script** to install Chocolatey and the required toolchain and helpers:
+   ```powershell
+   .\setup-bitnet.ps1
+   ```
+
+2. **Validate the installation** by running the `validate_installation.ps1` script:
+   ```powershell
+   .\validate_installation.ps1
+   ```
+
+3. **Dependency Validation**:
+   - Verify that all required dependencies are installed and their versions are correct.
+   - Check for the presence of specific files or directories that indicate successful installation of dependencies.
+   - Validate the integrity of downloaded files by comparing checksums.

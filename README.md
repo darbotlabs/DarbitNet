@@ -201,6 +201,19 @@ optional arguments:
   --quant-embd          Quantize the embeddings to f16
   --use-pretuned, -p    Use the pretuned kernel parameters
 </pre>
+
+### Install Chocolatey and Toolchain
+
+1. Run the `install_choco.ps1` script to install Chocolatey and the required toolchain and helpers:
+```powershell
+.\install_choco.ps1
+```
+
+2. Validate the installation by running the `validate_installation.ps1` script:
+```powershell
+.\validate_installation.ps1
+```
+
 ## Usage
 ### Basic usage
 ```bash
