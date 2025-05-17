@@ -42,7 +42,7 @@ Thus, we need to make sure
 
 For TL2, things got a little more complicated. Due to TL2 needs BK % 6 == 0, we need to split K into threeK and twoK, in which compute in TL2 for (M, threeK), compute in TL1 for (M, two_K).
 
-Thus, we needs to make sure
+Thus, we need to make sure
 - M % BM == 0
 - K % BK % 32 == 0
 - BM % bm == 0
