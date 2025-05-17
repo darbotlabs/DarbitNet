@@ -323,3 +323,14 @@ Import-Module "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common
 ```
 
 These steps will initialize your environment and allow you to use the correct Visual Studio tools.
+
+## Running Tests
+
+Unit tests are executed with [pytest](https://pytest.org). After installing the
+project dependencies, run:
+
+```bash
+pytest
+```
+
+This command will discover and run all tests in the `tests/` directory.
