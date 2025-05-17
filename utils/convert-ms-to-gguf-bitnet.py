@@ -73,7 +73,7 @@ class UnquantizedDataType(DataType):
 
 DT_F16  = UnquantizedDataType('F16',  dtype = np.dtype(np.float16), valid_conversions = ['F32', 'Q8_0'])
 DT_F32  = UnquantizedDataType('F32',  dtype = np.dtype(np.float32), valid_conversions = ['F16', 'Q8_0', 'I2'])
-DT_I32  = UnquantizedDataType('I32',  dtype = np.dtype(np.int16),   valid_conversions = [])
+DT_I32  = UnquantizedDataType('I32',  dtype = np.dtype(np.int32),   valid_conversions = [])
 DT_BF16 = UnquantizedDataType('BF16', dtype = np.dtype(np.uint16),  valid_conversions = ['F32', 'F16', 'Q8_0'])
 DT_I2   = UnquantizedDataType('I2',   dtype = np.dtype(np.uint8),   valid_conversions = ['F32', 'F16', 'Q8_0'])
 
