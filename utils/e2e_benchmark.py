@@ -46,7 +46,7 @@ def run_benchmark():
     run_command(command)
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Setup the environment for running the inference')
+    parser = argparse.ArgumentParser(description='Run the inference benchmark')
     parser.add_argument("-m", "--model", type=str, help="Path to model file", required=True)
     parser.add_argument("-n", "--n-token", type=int, help="Number of generated tokens", required=False, default=128)
     parser.add_argument("-p", "--n-prompt", type=int, help="Prompt to generate text from", required=False, default=512)
