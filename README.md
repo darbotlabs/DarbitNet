@@ -202,16 +202,14 @@ optional arguments:
   --use-pretuned, -p    Use the pretuned kernel parameters
 </pre>
 
-### Install Chocolatey and Toolchain
+### Quick start setup
 
-1. Run the `install_choco.ps1` script to install Chocolatey and the required toolchain and helpers:
-```powershell
-.\install_choco.ps1
-```
+Open **PowerShell as Administrator** and run the all-in-one script to install
+the toolchain, set up the Python environment and fetch a model. The script
+prints the result of each stage and logs everything to `setup-log.txt`.
 
-2. Validate the installation by running the `validate_installation.ps1` script:
 ```powershell
-.\validate_installation.ps1
+.\setup-bitnet.ps1
 ```
 
 ## Usage
