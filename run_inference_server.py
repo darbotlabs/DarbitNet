@@ -55,7 +55,7 @@ if __name__ == "__main__":
         "-m",
         "--model",
         type=str,
-        help="Path to model file",
+        help="Path to model file (default: models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf)",
         required=False,
         default="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf",
     )
