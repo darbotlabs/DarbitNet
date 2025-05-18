@@ -4,7 +4,7 @@
 
 [<img src="./assets/header_model_release.png" alt="BitNet Model on Hugging Face" width="800"/>](https://huggingface.co/microsoft/BitNet-b1.58-2B-4T)
 
-Try it out via this [demo](https://bitnet-demo.azurewebsites.net/), or [build and run](https://github.com/microsoft/BitNet?tab=readme-ov-file#build-from-source) it on your own CPU.
+Try it out via this [demo](https://bitnet-demo.azurewebsites.net/), or [build and run](https://github.com/darbotlabs/DarbotNet#build-from-source) it on your own CPU.
 
 bitnet.cpp is the official inference framework for 1-bit LLMs (e.g., BitNet b1.58). It offers a suite of optimized kernels, that support **fast** and **lossless** inference of 1.58-bit models on CPU (with NPU and GPU support coming next).
 
@@ -164,8 +164,8 @@ This project is based on the [llama.cpp](https://github.com/ggerganov/llama.cpp)
 
 1. Clone the repo
 ```bash
-git clone --recursive https://github.com/microsoft/BitNet.git
-cd BitNet
+git clone --recursive https://github.com/darbotlabs/DarbotNet.git
+cd DarbotNet
 ```
 2. Install the dependencies
 ```bash
