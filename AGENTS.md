@@ -1,5 +1,16 @@
 # DarbitNet — **AGENTS.md**
 
+## 1 Project overview
+
+DarbitNet is a **fork of Microsoft’s BitNet 1‑bit LLM runtime (`bitnet.cpp`)** with additional “Bitplots” utilities and Windows‑first tooling. The goal is to empower every person and every organization on the planet to use their existing CPUs and devices to run modern, ternary‑quantised LLMs and expose them as embeddable agents for Copilot, Windows, Powershell, PowerFX, Power Automate, VS Code, Home Assistant, etc. in a highly extensible framework.  
+
+```
+/src            ←  C++ inference kernels + CLI
+/darbot-src     ←  Custom Windows helpers (.ps1, C# tools)
+/preset_kernels ←  Pre‑baked GGUF kernels for i2_s, tl1, etc.
+/tests          ←  Smoke tests & perf harness
+/docs           ←  Architecture notes, tech reports
+=======
 *Configuration & contributor guide for ChatGPT\u00a0Codex*
 
 ---
@@ -9,16 +20,15 @@
 DarbitNet is a **fork of Microsoft\u2019s BitNet 1\u2011bit LLM runtime (`bitnet.cpp`)** with additional \u201cBitplots\u201d utilities and Windows\u2011first tooling. The goal is to let small CPUs run modern, ternary\u2011quantised LLMs and expose them as embeddable agents for Power\u00a0Automate, VS\u00a0Code, Home\u00a0Assistant, etc.
 
 ```
-/src            \u2190  C++ inference kernels + CLI
-/darbot-src     \u2190  Custom Windows helpers (.ps1, C# tools)
-/preset_kernels \u2190  Pre\u2011baked GGUF kernels for i2_s, tl1, etc.
-/tests          \u2190  Smoke tests & perf harness
-/docs           \u2190  Architecture notes, tech reports
-```
 
 Codex tasks will normally touch **`src/`**, **`darbot-src/`**, or **`tests/`**.
 
 ---
+
+codex/check-bitnet-directory-completeness-for-darbitnet-and-window
+## 2 Environment & setup commands
+
+Codex containers start from `ubuntu:22.04`— supply all dependencies **before network lock‑down**.
 
 ## 2\u2003Environment & setup commands
 
@@ -43,61 +53,189 @@ pwsh -File install_choco.ps1 -SkipReboot
 
 ---
 
-## 3\u2003Validation commands
+## 3 Validation commands
 
 | Stage              | Command                              | Pass criteria          |
 | ------------------ | ------------------------------------ | ---------------------- |
-| **C++ unit tests** | `ctest --output-on-failure`          | All tests\u00a0\u2714            |
-| **Python lint**    | `flake8 darbot-src/ tests/`          | 0\u00a0errors               |
-| **Clang\u2011format**   | `bash utils/check_style.sh`          | No diff                |
-| **Perf smoke**     | `python tests/benchmark.py -p smoke` | \u2265\u00a015\u00a0tok/s on 2\u00a0B GGUF |
+| **C++ unit tests** | `ctest --output-on-failure`          | All tests ✔            |
+| **Python lint**    | `flake8 darbot-src/ tests/`          | 0 errors               |
+| **Clang‑format**   | `bash utils/check_style.sh`          | No diff                |
+| **Perf smoke**     | `python tests/benchmark.py -p smoke` | ≥ 15 tok/s on 2 B GGUF |
+
 
 Codex should run *at least* the first three checks for every change and include results in PR comments.
 
 ---
 
-## 4\u2003Typical Codex prompts
+## 4 Typical Codex prompts
 
 | Task                        | Example prompt                                                                                                              |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Add new SIMD kernel**     | \u201cImplement AVX\u2011512 path for **BitLinear** in `src/kernels/avx2.cpp`, mirroring ARM\u00a0TL1 logic.\u201d                              |
-| **Refactor Windows helper** | \u201cSplit `setup-bitnet.ps1` into `install_deps.ps1` and `compile.ps1` for readability.\u201d                                       |
-| **Bug hunt**                | \u201cBitNet crashes on GGUF with embeddings quantised (`--quant-embd`). Reproduce via `tests/embd_quant.sh` and fix.\u201d           |
-| **Add regression test**     | \u201cCreate a pytest that loads the 3\u00a0B model from Hugging\u00a0Face and asserts token *hello* \u2192 *world* log\u2011prob within tolerance.\u201d |
+| **Add new SIMD kernel**     | “Implement AVX‑512 path for **BitLinear** in `src/kernels/avx2.cpp`, mirroring ARM TL1 logic.”                              |
+| **Refactor Windows helper** | “Split`setup-bitnet.ps1` into `install_deps.ps1` and `compile.ps1` for readability.”                                       |
+| **Bug hunt**                | “BitNet crashes on GGUF with embeddings quantised (`--quant-embd`). Reproduce via `tests/embd_quant.sh` and fix.”           |
+| **Add regression test**     | “Create a pytest that loads the 3 B model from Hugging Face and asserts token *hello* → *world* log‑prob within tolerance.” |
 
 ---
 
-## 5\u2003Contribution & style guidelines
+## 5 Contribution & style guidelines
 
-* **C++** \u2013 follow LLVM style (`clang-format -style=file`), no `using namespace std;`.
-* **Python** \u2013 black\u2011formatted, type\u2011annotated; prefer `pathlib` over `os.path`.
-* **PowerShell** \u2013 ScriptAnalyzer clean, use functions & comment\u2011based help.
-* **Commit titles** \u2013 prefix with `[kernel]`, `[ps1]`, `[docs]`, `[test]`.
-  **Commit signature:** append the footer line `thought into existence by darbot` to *every* commit message and pull\u2011request description.
+* **C++** – follow LLVM style (`clang-format -style=file`), no `using namespace std;`.
+* **Python** – black‑formatted, type‑annotated; prefer `pathlib` over `os.path`.
+* **PowerShell** – ScriptAnalyzer clean, use functions & comment‑based help.
+* **Commit titles** – prefix with `[kernel]`, `[ps1]`, `[docs]`, `[test]`.
+  **Commit signature:** append the footer line `thought into existence by darbot` to *every* commit message and pull‑request description.
 * PR title format:
 
   ```
-  [<area>] <imperative, 50\u2011char summary>
+  [<area>] <imperative, 50‑char summary>
   ```
 * Every new kernel or quant scheme **must ship a benchmark & unit test**.
-* Update **`docs/CHANGELOG.md`** with a one\u2011liner.
+* Update **`docs/CHANGELOG.md`** with a one‑liner.
 
 ---
 
-## 6\u2003Long\u2011term roadmap (for Codex planning) roadmap (for Codex planning)
+## 6 Long‑term roadmap (for Codex planning) roadmap (for Codex planning)
 
-1. **AVX\u2011512 & AMX kernels**\u00a0\u2014 exploit new Intel instructions.
-2. **On\u2011device fine\u2011tuning**\u00a0\u2014 integrate QLoRA path using BF16 master weights.
-3. **Vision bridge**\u00a0\u2014 add OCR\u00a0\u2192\u00a0BitNet loop for screen\u2011control agents.
-4. **Cross\u2011platform CI**\u00a0\u2014 GitHub Actions matrix: Linux, Windows, macOS\u00a0ARM.
-5. **Energy profiling**\u00a0\u2014 emit RAPL stats during benchmarks and compare with FP16.
+1. **AVX‑512 & AMX kernels** — exploit new Intel instructions.
+2. **On‑device fine‑tuning** — integrate QLoRA path using BF16 master weights.
+3. **Vision bridge** — add OCR → BitNet loop for screen‑control agents.
+4. **Cross‑platform CI** — GitHub Actions matrix: Linux, Windows, macOS ARM.
+5. **Energy profiling** — emit RAPL stats during benchmarks and compare with FP16.
 
 ---
 
-## 7\u2003Useful context for the agent
+## 7 Useful context for the agent
 
-* **BitNet architecture** \u2014 ternary weights, 8\u2011bit activations, SubLN, RoPE.
-* **Quant kernels** \u2014 `i2_s` (x86 AVX2), `tl1` (Apple\u00a0ARM), `b1_g` (generic).
-* The project inherits build flags & code layout from upstream BitNet, so upstream commits are usually back\u2011portable.
+* **BitNet architecture** — ternary weights, 8‑bit activations, SubLN, RoPE.
+* **Quant kernels** — `i2_s` (x86 AVX2), `tl1` (Apple ARM), `b1_g` (generic).
+* The project inherits build flags & code layout from upstream BitNet, so upstream commits are usually back‑portable.
 
 *For additional context on Codex workflow & restrictions, see the internal **`Codex.txt`** guide in the repo root.*
+
+<!-- End of previous sections -->
+
+
+<!-- ──────────────────────────────────────────────────────────────── ─-->
+## 8  Reasoning & Self-Validation Framework  
+*thought into existence by darbot*  
+<!-- ──────────────────────────────────────────────────────────────── -->
+
+### 9 Purpose
+> Provide deterministic, inspectable guard-rails so every DarbotNet agent can  
+> 1. expose its chain-of-thought (“scratchpad”) in a machine-parsable form,  
+> 2. score its own output against objective rubrics,  
+> 3. iterate up to **N loops (default = 20)** until quality thresholds are met.
+
+### 10 Self-Validation Loop (High-Level Algorithm)
+
+| Step | Action | Implementation Hint |
+|------|--------|---------------------|
+| 1    |**Draft** initial answer / artifact. | Use the Scratchpad template in §5.4 while thinking. |
+| 2    |**Run Linters / Unit Tests.** | `npm test`, `pytest`, `pester`, etc. |
+| 3    |**Score** draft using _Validation Rubric_ (§5.3). | Create `.validation/score.json`. |
+| 4    |**Decision Gate.** If all metrics ≥ target, **commit**<sup>†</sup>; else continue. | Targets configurable via `AGENT_QA_TARGETS` env var. |
+| 5    |**Reflect.** Write a short *“Why-did-I-miss”* note to `scratchpad.reflect`. |
+| 6    |**Revise** output, prioritizing highest-impact failures. | Avoid repeating unchanged text. |
+| 7    |Back to Step 2 (max **N loops**). | |
+| 8    |On final pass, **emit `scratchpad.final`** and **push** commit. | Commit message prefix: `thought into existence by darbot:` |
+| 9    |If max loops exhausted without passing, raise `ValidationError` event. | |
+| 10   |Super-agent (or human) triages unresolved failures. | |
+
+<sup>†</sup>All pushes/pulls **must** include the phrase **“thought into existence by darbot”** to satisfy repo policy.
+
+### 11 Validation Rubric (default weights)
+
+| Metric | Weight | Success Threshold |
+|--------|--------|-------------------|
+| Technical Accuracy | 0.35 | **≥ 9 / 10** |
+| Unique Insight     | 0.20 | **≥ 8 / 10** |
+| Internal Consistency | 0.15 | **No contradictions** |
+| No Redundancy      | 0.10 | **< 5 % duplicate lines** |
+| Code Health        | 0.10 | **0 linter errors** |
+| Style Conformance  | 0.10 | **≥ 90 % style-guide pass** |
+
+*Total score ≥ 90 % passes the gate.*
+
+### 12 Scratchpad Thought Output Specification
+
+| Field | Description |
+|-------|-------------|
+| `meta.agent_id` | Short agent name (e.g. `doc-auditor-v2`). |
+| `meta.iteration` | Current loop count (1–N). |
+| `thoughts.raw` | Stream-of-consciousness in **plain text**, 1-2 sentences per line. |
+| `thoughts.plan` | Bullet list of next atomic actions. |
+| `validation.score` | Object mirroring rubric keys + numeric scores. |
+| `validation.pass` | `true` / `false`. |
+| `reflection` | If `validation.pass == false`, short cause analysis. |
+
+> **⚠ Do NOT** include secrets, PII, or proprietary client data in the scratchpad. It is committed under `.git/info/scratchpads/`.
+
+##### Example (`scratchpad.iter1.json`)
+```jsonc
+{
+  "meta": { "agent_id": "doc-auditor-v2", "iteration": 1 },
+  "thoughts": {
+    "raw": [
+      "Need to confirm file paths for unit tests.",
+      "Rubric weightings look correct but thresholds may be high."
+    ],
+    "plan": [
+      "Run npm test",
+      "Capture linter output",
+      "Compute rubric scores"
+    ]
+  },
+  "validation": {
+    "score": {
+      "technical_accuracy": 7,
+      "unique_insight": 6,
+      "internal_consistency": 10,
+      "no_redundancy": 9,
+      "code_health": 6,
+      "style_conformance": 8
+    },
+    "pass": false
+  },
+  "reflection": "Accuracy low: overlooked edge-case in module loader."
+}
+```
+
+### 13 Agent Hooks & Env Vars
+
+| Hook              | When Fired         | Payload                |
+| ----------------- | ------------------ | ---------------------- |
+| `pre-validate`    | Just before Step 2 | Path to draft artifact |
+| `post-validate`   | After Step 3       | `score.json`           |
+| `validation-fail` | After max loops    | Full scratchpad bundle |
+
+| Env Var                | Purpose                    | Default |
+| ---------------------- | -------------------------- | ------- |
+| `MAX_VALIDATION_LOOPS` | Max self-iterations        | `20`    |
+| `AGENT_QA_TARGETS`     | Override rubric thresholds | *unset* |
+
+### 14 Audit & Transparency
+
+* All `scratchpad.*` files are stored in `./.git/info/scratchpads/` (excluded from distribution builds but visible to auditors).
+* CI step `ci/verify-scratchpad.sh` ensures every commit tagged **“thought into existence by darbot”** also contains a passing `scratchpad.final`.
+* A GitHub Action uploads the final score to the repo dashboard badge (`README.md`).
+
+<!-- End of Section 5 -->
+
+---
+
+### How to integrate
+
+1. **Add** this entire block under the “Agents & Personas” section (or keep as standalone §5).  
+2. **Reference** the Validation hooks from any agent descriptor table so Codex knows they exist.  
+3. **Ensure** your repo’s CI includes the simple shell/Powershell verifier mentioned in 5.6.  
+4. **Profit 😉—every DarbotNet agent now self-critiques before polluting `main`.
+
+---
+
+## Self-analysis Example
+
+*Quality-improvement score (1-10): **9**  
+*Focus next time:* tighten “How to integrate” into even more actionable bullet sequence (include exact file paths).
+
+---

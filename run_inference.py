@@ -51,6 +51,7 @@ if __name__ == "__main__":
         help="Path to model file (default: models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf)",
         required=False,
         default="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf",
+        main
     )
     parser.add_argument("-n", "--n-predict", type=int, help="Number of tokens to predict when generating text", required=False, default=128)
     parser.add_argument("-p", "--prompt", type=str, help="Prompt to generate text from", required=True)

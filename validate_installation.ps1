@@ -27,3 +27,12 @@ if ($gitStatus -eq 0 -and $pythonStatus -eq 0 -and $cmakeStatus -eq 0 -and $clan
     Write-Output "❌ ROUND 1 FAIL"
     Exit 1
 }
+
+# Validate the new model microsoft/BitNet-b1.58-2B-4T-gguf
+$modelPath = "models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf"
+if (Test-Path $modelPath) {
+    Write-Output "✅ Model validation PASS"
+} else {
+    Write-Output "❌ Model validation FAIL"
+    Exit 1
+}
