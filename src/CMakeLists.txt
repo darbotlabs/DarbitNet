@@ -10,3 +10,6 @@ if (NOT (CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GN
     NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
     message(FATAL_ERROR "Clang or GCC is required for Bitnet.cpp compilation")
 endif()
+
+set(LLAMA_BUILD_SERVER ON CACHE BOOL "Build llama.cpp server" FORCE)
+add_subdirectory(3rdparty/llama.cpp)

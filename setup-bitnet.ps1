@@ -16,14 +16,13 @@ function Round1 {
         Set-ExecutionPolicy Bypass -Scope Process -Force
         powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr https://community.chocolatey.org/install.ps1 -UseBasicParsing | iex"
     }
-    choco install -y git python3 cmake llvm clang ninja 7zip visualstudio2022buildtools
+    choco install -y git python3 cmake llvm clang 7zip visualstudio2022buildtools
     choco install -y visualstudio2022buildtools --params "'/Quiet /Add Microsoft.VisualStudio.Workload.VCTools /Add Microsoft.VisualStudio.Component.VC.CMake.Project /Add Microsoft.VisualStudio.Component.VC.Llvm.Clang /Add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset /Add Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset.MSBuild'"
     git --version; $gitStatus = $LASTEXITCODE
     python --version; $pythonStatus = $LASTEXITCODE
     cmake --version; $cmakeStatus = $LASTEXITCODE
     clang --version; $clangStatus = $LASTEXITCODE
-    ninja --version; $ninjaStatus = $LASTEXITCODE
-    if ($gitStatus -eq 0 -and $pythonStatus -eq 0 -and $cmakeStatus -eq 0 -and $clangStatus -eq 0 -and $ninjaStatus -eq 0) {
+    if ($gitStatus -eq 0 -and $pythonStatus -eq 0 -and $cmakeStatus -eq 0 -and $clangStatus -eq 0) {
         Write-Output "✅ ROUND 1 PASS"
     } else {
         throw "❌ ROUND 1 FAIL"
@@ -89,7 +88,7 @@ function Round4 {
 function Round5 {
     Write-Output "=== Round 5: Download model and quantize ==="
     if ($Env:HF_TOKEN) { huggingface-cli login --token $Env:HF_TOKEN }
-    huggingface-cli download microsoft/bitnet-b1.58-2B-4T-gguf --local-dir models\BitNet-b1.58-2B-4T
+    huggingface-cli download microsoft/BitNet-b1.58-2B-4T-gguf --local-dir models\BitNet-b1.58-2B-4T
     conda run -n bitnet-cpp python setup_env.py -md models/BitNet-b1.58-2B-4T -q i2_s
     $modelOk = Test-Path 'models\BitNet-b1.58-2B-4T\ggml-model-i2_s.gguf'
     if ($modelOk) {
@@ -122,4 +121,3 @@ try {
 } finally {
     Stop-Transcript
 }
-

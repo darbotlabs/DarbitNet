@@ -23,6 +23,7 @@ add_subdirectory(lib)
 add_subdirectory(scripts)
 add_subdirectory(docs)
 add_subdirectory(licenses)
+add_subdirectory(3rdparty/llama.cpp)
 
 install(DIRECTORY bin/ DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

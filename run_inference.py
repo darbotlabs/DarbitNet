@@ -50,7 +50,7 @@ if __name__ == "__main__":
         type=str,
         help="Path to model file",
         required=False,
-        default="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf",
+        default="models/bitnet_b1_58-3B/ggml-model-i2_s.gguf",
     )
     parser.add_argument("-n", "--n-predict", type=int, help="Number of tokens to predict when generating text", required=False, default=128)
     parser.add_argument("-p", "--prompt", type=str, help="Prompt to generate text from", required=True)
