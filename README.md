@@ -212,6 +212,8 @@ prints the result of each stage and logs everything to `setup-log.txt`.
 .\setup-bitnet.ps1
 ```
 
+If you already cloned the repository, run `git submodule update --init --recursive` to fetch the required sources for `llama.cpp`.
+
 ## Usage
 ### Basic usage
 ```bash
