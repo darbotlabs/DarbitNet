@@ -13,49 +13,44 @@ def run_command(command, shell=False):
         print(f"Error occurred while running command: {e}")
         sys.exit(1)
 
-def run_server():
+def run_benchmark():
     build_dir = "build"
     if platform.system() == "Windows":
-        server_path = os.path.join(build_dir, "bin", "Release", "llama-server.exe")
-        if not os.path.exists(server_path):
-            server_path = os.path.join(build_dir, "bin", "llama-server.exe")
+        benchmark_path = os.path.join(build_dir, "bin", "Release", "llama-benchmark.exe")
+        if not os.path.exists(benchmark_path):
+            benchmark_path = os.path.join(build_dir, "bin", "llama-benchmark.exe")
     else:
-        server_path = os.path.join(build_dir, "bin", "llama-server")
+        benchmark_path = os.path.join(build_dir, "bin", "llama-benchmark")
     
     command = [
-        f'{server_path}',
+        f'{benchmark_path}',
         '-m', args.model,
         '-c', str(args.ctx_size),
         '-t', str(args.threads),
         '-n', str(args.n_predict),
         '-ngl', '0',
         '--temp', str(args.temperature),
-        '--host', args.host,
-        '--port', str(args.port),
-        '-cb'  # Enable continuous batching
+        '--benchmark', str(args.benchmark),
     ]
     
     if args.prompt:
         command.extend(['-p', args.prompt])
     
-    # Note: -cnv flag is removed as it's not supported by the server
-    
-    print(f"Starting server on {args.host}:{args.port}")
+    print(f"Starting benchmark with model {args.model}")
     run_command(command)
 
 def signal_handler(sig, frame):
-    print("Ctrl+C pressed, shutting down server...")
+    print("Ctrl+C pressed, exiting...")
     sys.exit(0)
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     
-    parser = argparse.ArgumentParser(description='Run llama.cpp server')
+    parser = argparse.ArgumentParser(description='Run end-to-end benchmark')
     parser.add_argument(
         "-m",
         "--model",
         type=str,
-
         help="Path to model file (default: models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf)",
         required=False,
         default="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf",
@@ -65,8 +60,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--threads", type=int, help="Number of threads to use", required=False, default=2)
     parser.add_argument("-c", "--ctx-size", type=int, help="Size of the context window", required=False, default=2048)
     parser.add_argument("--temperature", type=float, help="Temperature for sampling", required=False, default=0.8)
-    parser.add_argument("--host", type=str, help="IP address to listen on", required=False, default="127.0.0.1")
-    parser.add_argument("--port", type=int, help="Port to listen on", required=False, default=8080)
+    parser.add_argument("--benchmark", type=int, help="Number of benchmark iterations", required=False, default=10)
     
     args = parser.parse_args()
-    run_server()
+    run_benchmark()

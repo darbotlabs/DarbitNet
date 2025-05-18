@@ -1,12 +1,8 @@
 # DarbitNet — **AGENTS.md**
 
-*Configuration & contributor guide for ChatGPT Codex*
-
----
-
 ## 1 Project overview
 
-DarbitNet is a **fork of Microsoft’s BitNet 1‑bit LLM runtime (`bitnet.cpp`)** with additional “Bitplots” utilities and Windows‑first tooling. The goal is to let small CPUs run modern, ternary‑quantised LLMs and expose them as embeddable agents for Power Automate, VS Code, Home Assistant, etc.
+DarbitNet is a **fork of Microsoft’s BitNet 1‑bit LLM runtime (`bitnet.cpp`)** with additional “Bitplots” utilities and Windows‑first tooling. The goal is to empower every person and every organization on the planet to use their existing CPUs and devices to run modern, ternary‑quantised LLMs and expose them as embeddable agents for Copilot, Windows, Powershell, PowerFX, Power Automate, VS Code, Home Assistant, etc. in a highly extensible framework.  
 
 ```
 /src            ←  C++ inference kernels + CLI
@@ -14,15 +10,29 @@ DarbitNet is a **fork of Microsoft’s BitNet 1‑bit LLM runtime (`bitnet.cpp`)
 /preset_kernels ←  Pre‑baked GGUF kernels for i2_s, tl1, etc.
 /tests          ←  Smoke tests & perf harness
 /docs           ←  Architecture notes, tech reports
+=======
+*Configuration & contributor guide for ChatGPT\u00a0Codex*
+
+---
+
+## 1\u2003Project overview
+
+DarbitNet is a **fork of Microsoft\u2019s BitNet 1\u2011bit LLM runtime (`bitnet.cpp`)** with additional \u201cBitplots\u201d utilities and Windows\u2011first tooling. The goal is to let small CPUs run modern, ternary\u2011quantised LLMs and expose them as embeddable agents for Power\u00a0Automate, VS\u00a0Code, Home\u00a0Assistant, etc.
+
 ```
 
 Codex tasks will normally touch **`src/`**, **`darbot-src/`**, or **`tests/`**.
 
 ---
 
+codex/check-bitnet-directory-completeness-for-darbitnet-and-window
 ## 2 Environment & setup commands
 
 Codex containers start from `ubuntu:22.04`— supply all dependencies **before network lock‑down**.
+
+## 2\u2003Environment & setup commands
+
+Codex containers start from `ubuntu:22.04`\u00a0\u2014 supply all dependencies **before network lock\u2011down**.
 
 ```bash
 # --- INSTALL BUILD TOOLCHAIN & PYTHON ---
@@ -52,6 +62,7 @@ pwsh -File install_choco.ps1 -SkipReboot
 | **Clang‑format**   | `bash utils/check_style.sh`          | No diff                |
 | **Perf smoke**     | `python tests/benchmark.py -p smoke` | ≥ 15 tok/s on 2 B GGUF |
 
+
 Codex should run *at least* the first three checks for every change and include results in PR comments.
 
 ---
@@ -61,7 +72,7 @@ Codex should run *at least* the first three checks for every change and include 
 | Task                        | Example prompt                                                                                                              |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | **Add new SIMD kernel**     | “Implement AVX‑512 path for **BitLinear** in `src/kernels/avx2.cpp`, mirroring ARM TL1 logic.”                              |
-| **Refactor Windows helper** | “Split `setup-bitnet.ps1` into `install_deps.ps1` and `compile.ps1` for readability.”                                       |
+| **Refactor Windows helper** | “Split`setup-bitnet.ps1` into `install_deps.ps1` and `compile.ps1` for readability.”                                       |
 | **Bug hunt**                | “BitNet crashes on GGUF with embeddings quantised (`--quant-embd`). Reproduce via `tests/embd_quant.sh` and fix.”           |
 | **Add regression test**     | “Create a pytest that loads the 3 B model from Hugging Face and asserts token *hello* → *world* log‑prob within tolerance.” |
 
@@ -106,17 +117,17 @@ Codex should run *at least* the first three checks for every change and include 
 
 
 <!-- ──────────────────────────────────────────────────────────────── ─-->
-## 5  Reasoning & Self-Validation Framework  
+## 8  Reasoning & Self-Validation Framework  
 *thought into existence by darbot*  
 <!-- ──────────────────────────────────────────────────────────────── -->
 
-### 5.1 Purpose
+### 9 Purpose
 > Provide deterministic, inspectable guard-rails so every DarbotNet agent can  
 > 1. expose its chain-of-thought (“scratchpad”) in a machine-parsable form,  
 > 2. score its own output against objective rubrics,  
 > 3. iterate up to **N loops (default = 20)** until quality thresholds are met.
 
-### 5.2 Self-Validation Loop (High-Level Algorithm)
+### 10 Self-Validation Loop (High-Level Algorithm)
 
 | Step | Action | Implementation Hint |
 |------|--------|---------------------|
@@ -133,7 +144,7 @@ Codex should run *at least* the first three checks for every change and include 
 
 <sup>†</sup>All pushes/pulls **must** include the phrase **“thought into existence by darbot”** to satisfy repo policy.
 
-### 5.3 Validation Rubric (default weights)
+### 11 Validation Rubric (default weights)
 
 | Metric | Weight | Success Threshold |
 |--------|--------|-------------------|
@@ -146,7 +157,7 @@ Codex should run *at least* the first three checks for every change and include 
 
 *Total score ≥ 90 % passes the gate.*
 
-### 5.4 Scratchpad Thought Output Specification
+### 12 Scratchpad Thought Output Specification
 
 | Field | Description |
 |-------|-------------|
@@ -190,7 +201,7 @@ Codex should run *at least* the first three checks for every change and include 
 }
 ```
 
-### 5.5 Agent Hooks & Env Vars
+### 13 Agent Hooks & Env Vars
 
 | Hook              | When Fired         | Payload                |
 | ----------------- | ------------------ | ---------------------- |
@@ -203,7 +214,7 @@ Codex should run *at least* the first three checks for every change and include 
 | `MAX_VALIDATION_LOOPS` | Max self-iterations        | `20`    |
 | `AGENT_QA_TARGETS`     | Override rubric thresholds | *unset* |
 
-### 5.6 Audit & Transparency
+### 14 Audit & Transparency
 
 * All `scratchpad.*` files are stored in `./.git/info/scratchpads/` (excluded from distribution builds but visible to auditors).
 * CI step `ci/verify-scratchpad.sh` ensures every commit tagged **“thought into existence by darbot”** also contains a passing `scratchpad.final`.
@@ -222,8 +233,9 @@ Codex should run *at least* the first three checks for every change and include 
 
 ---
 
-## Self-analysis
+## Self-analysis Example
 
 *Quality-improvement score (1-10): **9**  
 *Focus next time:* tighten “How to integrate” into even more actionable bullet sequence (include exact file paths).
 
+---

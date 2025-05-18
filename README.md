@@ -178,7 +178,7 @@ pip install -r requirements.txt
 3. Build the project
 ```bash
 # Manually download the model and run with local path
-huggingface-cli download microsoft/BitNet-b1.58-2B-4T-gguf --local-dir models/BitNet-b1.58-2B-4T
+huggingface-cli download darbotlabs/DarbotNet-b1.58-2B-4T-gguf --local-dir models/BitNet-b1.58-2B-4T
 python setup_env.py -md models/BitNet-b1.58-2B-4T -q i2_s
 
 ```
@@ -204,7 +204,7 @@ optional arguments:
 
 ### Quick start setup
 
-Open **PowerShell as Administrator** and run the all-in-one script to install
+Open **PowerShell as Administrator** in the root of this repository and run the all-in-one script to install
 the toolchain, set up the Python environment and fetch a model. The script
 prints the result of each stage and logs everything to `setup-log.txt`.
 

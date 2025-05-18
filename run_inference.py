@@ -18,7 +18,7 @@ def run_inference():
     if platform.system() == "Windows":
         main_path = os.path.join(build_dir, "bin", "Release", "llama-cli.exe")
         if not os.path.exists(main_path):
-            main_path = os.path.join(build_dir, "bin", "llama-cli")
+            main_path = os.path.join(build_dir, "bin", "llama-cli.exe")
     else:
         main_path = os.path.join(build_dir, "bin", "llama-cli")
     command = [
@@ -48,15 +48,16 @@ if __name__ == "__main__":
         "-m",
         "--model",
         type=str,
-        help="Path to model file",
+        help="Path to model file (default: models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf)",
         required=False,
-        default="models/bitnet_b1_58-3B/ggml-model-i2_s.gguf",
+        default="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf",
+        main
     )
     parser.add_argument("-n", "--n-predict", type=int, help="Number of tokens to predict when generating text", required=False, default=128)
     parser.add_argument("-p", "--prompt", type=str, help="Prompt to generate text from", required=True)
     parser.add_argument("-t", "--threads", type=int, help="Number of threads to use", required=False, default=2)
     parser.add_argument("-c", "--ctx-size", type=int, help="Size of the prompt context", required=False, default=2048)
-    parser.add_argument("-temp", "--temperature", type=float, help="Temperature, a hyperparameter that controls the randomness of the generated text", required=False, default=0.8)
+    parser.add_argument("--temperature", type=float, help="Temperature, a hyperparameter that controls the randomness of the generated text", required=False, default=0.8)
     parser.add_argument("-cnv", "--conversation", action='store_true', help="Whether to enable chat mode or not (for instruct models.)")
 
     args = parser.parse_args()
