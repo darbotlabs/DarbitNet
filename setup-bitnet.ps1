@@ -22,7 +22,8 @@ function Round1 {
     python --version; $pythonStatus = $LASTEXITCODE
     cmake --version; $cmakeStatus = $LASTEXITCODE
     clang --version; $clangStatus = $LASTEXITCODE
-    if ($gitStatus -eq 0 -and $pythonStatus -eq 0 -and $cmakeStatus -eq 0 -and $clangStatus -eq 0) {
+    ninja --version; $ninjaStatus = $LASTEXITCODE
+    if ($gitStatus -eq 0 -and $pythonStatus -eq 0 -and $cmakeStatus -eq 0 -and $clangStatus -eq 0 -and $ninjaStatus -eq 0) {
         Write-Output "✅ ROUND 1 PASS"
     } else {
         throw "❌ ROUND 1 FAIL"
