@@ -75,7 +75,7 @@ function Round4 {
     Enter-VsDevShell -SkipAutomaticLocation -DevCmdArguments "-arch=x64 -host_arch=x64"
     if (-not (Test-Path build)) { New-Item -Type Directory -Path build | Out-Null }
     Set-Location build
-    cmake -G 'Ninja' -DCMAKE_BUILD_TYPE=Release ..
+    cmake -G 'Ninja' -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ..
     cmake --build . --config Release
     $dll = Test-Path '.\bin\bitnet_cpp.dll'
     if ($dll) {
