@@ -56,6 +56,7 @@ function Round3 {
         git clone --recursive https://github.com/darbotlabs/DarbotNet.git $repoPath
     }
     Set-Location $repoPath
+    git submodule update --init --recursive # ensures 3rdparty/llama.cpp is present
     conda run -n bitnet-cpp pip install -r requirements.txt
     $hasFile = Test-Path "$repoPath\src\CMakeLists.txt"
     conda run -n bitnet-cpp python -c "import torch, sentencepiece, numpy, tqdm, packaging, huggingface_hub; print('Deps OK')" > $null
