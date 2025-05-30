@@ -100,9 +100,10 @@ function Round4 {
 
 function Round5 {
     Write-Output "=== Round 5: Download model and quantize ==="
-    if ($Env:HF_TOKEN) { huggingface-cli login --token $Env:HF_TOKEN }
-    huggingface-cli download microsoft/BitNet-b1.58-2B-4T-gguf --local-dir models\BitNet-b1.58-2B-4T
-    conda run -n bitnet-cpp python setup_env.py -md models/BitNet-b1.58-2B-4T -q i2_s
+    if ($Env:HF_TOKEN) { 
+        $env:HF_TOKEN = $Env:HF_TOKEN
+    }
+    conda run -n bitnet-cpp python setup_env.py -hr microsoft/BitNet-b1.58-2B-4T -md models/BitNet-b1.58-2B-4T -q i2_s
     $modelOk = Test-Path 'models\BitNet-b1.58-2B-4T\ggml-model-i2_s.gguf'
     if ($modelOk) {
         Write-Output "✅ ROUND 5 PASS"
