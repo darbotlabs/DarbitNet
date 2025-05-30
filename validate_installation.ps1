@@ -1,38 +1,51 @@
-# Validate the installation of git, python, cmake, clang, and ninja
+<#
+.SYNOPSIS
+Validates the installed toolchain and presence of the default BitNet model.
 
-# Check git version
-git --version
-$gitStatus = $LASTEXITCODE
+.DESCRIPTION
+Runs simple version checks for git, python, cmake, clang and ninja. It then
+verifies that the expected model file exists in the repository.
 
-# Check python version
-python --version
-$pythonStatus = $LASTEXITCODE
+.EXAMPLE
+pwsh -File .\validate_installation.ps1
+#>
 
-# Check cmake version
-cmake --version
-$cmakeStatus = $LASTEXITCODE
+function Test-Toolchain {
+    git --version | Out-Null
+    $gitStatus = $LASTEXITCODE
 
-# Check clang version
-clang --version
-$clangStatus = $LASTEXITCODE
+    python --version | Out-Null
+    $pythonStatus = $LASTEXITCODE
 
-# Check ninja version
-ninja --version
-$ninjaStatus = $LASTEXITCODE
+    cmake --version | Out-Null
+    $cmakeStatus = $LASTEXITCODE
 
-# Validate installation
-if ($gitStatus -eq 0 -and $pythonStatus -eq 0 -and $cmakeStatus -eq 0 -and $clangStatus -eq 0 -and $ninjaStatus -eq 0) {
+    clang --version | Out-Null
+    $clangStatus = $LASTEXITCODE
+
+    ninja --version | Out-Null
+    $ninjaStatus = $LASTEXITCODE
+
+    return ($gitStatus -eq 0 -and $pythonStatus -eq 0 -and $cmakeStatus -eq 0 -and $clangStatus -eq 0 -and $ninjaStatus -eq 0)
+}
+
+function Test-Model {
+    param(
+        [string]$Path = "models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf"
+    )
+    return (Test-Path $Path)
+}
+
+if (Test-Toolchain) {
     Write-Output "✅ ROUND 1 PASS"
 } else {
     Write-Output "❌ ROUND 1 FAIL"
-    Exit 1
+    exit 1
 }
 
-# Validate the new model microsoft/BitNet-b1.58-2B-4T-gguf
-$modelPath = "models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf"
-if (Test-Path $modelPath) {
+if (Test-Model) {
     Write-Output "✅ Model validation PASS"
 } else {
     Write-Output "❌ Model validation FAIL"
-    Exit 1
+    exit 1
 }
