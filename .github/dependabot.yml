@@ -1,0 +1,57 @@
+version: 2
+updates:
+  # Enable version updates for Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "darbotlabs"
+    assignees:
+      - "darbotlabs"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # Enable version updates for Python dependencies in 3rdparty
+  - package-ecosystem: "pip"
+    directory: "/3rdparty/llama.cpp"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "darbotlabs"
+    assignees:
+      - "darbotlabs"
+    commit-message:
+      prefix: "deps(llama.cpp)"
+      include: "scope"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "darbotlabs"
+    assignees:
+      - "darbotlabs"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+
+  # Enable version updates for Git submodules
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "darbotlabs"
+    assignees:
+      - "darbotlabs"
+    commit-message:
+      prefix: "deps(submodule)"
+      include: "scope"

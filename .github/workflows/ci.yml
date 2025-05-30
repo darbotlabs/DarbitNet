@@ -1,0 +1,102 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest flake8 bandit safety
+        pip install -r requirements.txt
+        
+    - name: Lint with flake8
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+        
+    - name: Security scan with bandit
+      run: |
+        bandit -r . -f json -o bandit-report.json --exit-zero
+        
+    - name: Check dependencies for security issues
+      run: |
+        safety check --json --output safety-report.json --continue-on-error
+        
+    - name: Run tests
+      run: |
+        python -m pytest tests/ -v --junitxml=pytest-report.xml
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.os }}
+        path: |
+          pytest-report.xml
+          bandit-report.json
+          safety-report.json
+
+  build-cpp:
+    name: Build C++ Components
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Set up build tools (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build clang-18 lld
+        
+    - name: Set up build tools (Windows)
+      if: runner.os == 'Windows'
+      uses: microsoft/setup-msbuild@v2
+      
+    - name: Set up build tools (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install cmake ninja llvm
+        
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        
+    - name: Build
+      run: |
+        cmake --build build --config Release
+        
+    - name: Run basic functionality test
+      run: |
+        # Test that binaries were built successfully
+        ls -la build/bin/
