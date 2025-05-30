@@ -6,13 +6,27 @@ Your mission is to provision a **bare Windows 11** PC, compile **darbotlabs/Darb
 
 ---
 
+## 📋 **Prerequisites**
+
+Before starting the quest, ensure you have:
+
+1. **Windows 11** with Administrator privileges
+2. **PowerShell 5.1 or later** (included with Windows 11)
+3. **Internet connection** for downloading tools and models
+4. **Hugging Face account** (optional but recommended - for model access)
+   - Sign up at [https://huggingface.co](https://huggingface.co)
+   - Create access token at [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+   - Set environment variable: `$Env:HF_TOKEN = "your_token_here"`
+
+---
+
 ## 🎯 **Quest Rules**
 
 | Rule | Detail |
 |------|--------|
 | **Language** | _PowerShell_ only – script named **`setup-bitnet.ps1`** |
 | **Scope** | End-to-end: tooling → repo → Conda → build → model → smoke test |
-| **Persistence** | Everything installs under `C:\DarbotNet` (create if absent). |
+| **Persistence** | Clone repository and install tools in default locations. Models stored in `models/` directory. |
 | **Automation** | Use silent / unattended flags where possible. |
 | **Checkpoints** | After each Validation Gate, emit “✅ ROUND X PASS” or “❌ ROUND X FAIL”. |
 | **Logging** | Pipe all script output to `setup-log.txt` for later inspection. |
@@ -32,7 +46,7 @@ Your mission is to provision a **bare Windows 11** PC, compile **darbotlabs/Darb
 2. **Install toolchain & helpers:**
 
    ```powershell
-   choco install -y git python3 cmake llvm clang 7zip visualstudio2022buildtools
+   choco install -y git python3 cmake llvm clang ninja 7zip visualstudio2022buildtools
    ```
 
    *Supply VS Build Tools with the **Desktop-C++**, **CMake**, **Clang** workloads using the `/Quiet /Add` flags via Chocolatey’s package.* ([Chocolatey Software][1], [Microsoft Learn][2], [Microsoft Learn][3])
@@ -40,7 +54,7 @@ Your mission is to provision a **bare Windows 11** PC, compile **darbotlabs/Darb
 **Validation Gate 1**
 
 ```powershell
-git --version; python --version; cmake --version; clang --version
+git --version; python --version; cmake --version; clang --version; ninja --version
 If ($LASTEXITCODE -eq 0) { "✅ ROUND 1 PASS" } Else { "❌ ROUND 1 FAIL"; Exit 1 }
 ```
 
@@ -75,19 +89,24 @@ If both succeed → **PASS**. ([docs.conda.io][4], [docs.conda.io][5])
 
 ### **Round 3 – Clone & Prep Sources**
 
-1. ```powershell
+1. **Clone the repository recursively:**
+
+   ```powershell
    git clone --recursive https://github.com/darbotlabs/DarbitNet.git C:\DarbotNet
    cd C:\DarbotNet
+   git submodule update --init --recursive
    ```
-2. ```powershell
-   pip install -r requirements.txt
+2. **Install Python dependencies in the conda environment:**
+
+   ```powershell
+   conda run -n bitnet-cpp pip install -r requirements.txt
    ```
 
 **Validation Gate 3**
 
 ```powershell
-Test-Path C:\DarbotNet\src\CMakeLists.txt
-python -c "import torch, sentencepiece, numpy, tqdm, packaging, huggingface_hub; print('Deps OK')"
+Test-Path src\CMakeLists.txt
+conda run -n bitnet-cpp python -c "import torch, sentencepiece, numpy, tqdm, packaging, huggingface_hub; print('Deps OK')"
 ```
 
 Success prints **Deps OK** → gate passes. ([GitHub][6], [Hugging Face][7])
@@ -106,14 +125,15 @@ Success prints **Deps OK** → gate passes. ([GitHub][6], [Hugging Face][7])
 
    ```powershell
    mkdir build; cd build
-   cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..
+   cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ ..
    cmake --build . --config Release
+   cd ..
    ```
 
 **Validation Gate 4**
 
 ```powershell
-Test-Path .\bin\bitnet_cpp.dll
+Test-Path build\bin\bitnet_cpp.dll
 ```
 
 DLL present → **PASS**; else fail. ([GitHub][8])
@@ -122,26 +142,23 @@ DLL present → **PASS**; else fail. ([GitHub][8])
 
 ### **Round 5 – Model Fetch & Quantize**
 
-1. **Log-in to Hugging Face (if token provided)**.
+1. **Ensure HF token is set (if required):**
 
    ```powershell
-   huggingface-cli login --token $Env:HF_TOKEN
+   # Optional: Set your Hugging Face token for model access
+   # $Env:HF_TOKEN = "your_token_here"
    ```
-2. **Download model locally:**
+
+2. **Download model using setup script:**
 
    ```powershell
-   huggingface-cli download microsoft/bitnet-b1.58-2B-4T-gguf --local-dir C:\DarbotNet\models\BitNet-b1.58-2B-4T
-   ```
-3. **Prepare environment & quantization (i2\_s):**
-
-   ```powershell
-   python setup_env.py -md models/BitNet-b1.58-2B-4T -q i2_s
+   conda run -n bitnet-cpp python setup_env.py -hr microsoft/BitNet-b1.58-2B-4T -md models/BitNet-b1.58-2B-4T -q i2_s
    ```
 
 **Validation Gate 5**
 
 ```powershell
-Test-Path C:\DarbotNet\models\BitNet-b1.58-2B-4T\ggml-model-i2_s.gguf
+Test-Path models\BitNet-b1.58-2B-4T\ggml-model-i2_s.gguf
 ```
 
 File exists → **PASS**. ([Hugging Face][9], [Hugging Face][10], [Hugging Face][7])
@@ -150,8 +167,10 @@ File exists → **PASS**. ([Hugging Face][9], [Hugging Face][10], [Hugging Face]
 
 ### **Round 6 – Smoke-Test Inference**
 
-1. ```powershell
-   python run_inference.py -m models/BitNet-b1.58-2B-4T\ggml-model-i2_s.gguf -p "You are a helpful assistant" -n 16 -cnv
+1. **Run inference command:**
+
+   ```powershell
+   conda run -n bitnet-cpp python run_inference.py -m models/BitNet-b1.58-2B-4T\ggml-model-i2_s.gguf -p "You are a helpful assistant" -n 16 -cnv
    ```
 2. Capture first output tokens; if script returns text within 10 s, declare success.
 
@@ -199,17 +218,31 @@ Good luck, Agent GPT-4-1 … the BitNet awaits!
 
 ## 🛠️ **Setup Instructions**
 
-1. **Run the `setup-bitnet.ps1` script** to install Chocolatey and the required toolchain and helpers:
+### **Option 1: Automated Setup (Recommended)**
+
+1. **Clone the repository:**
+   ```powershell
+   git clone --recursive https://github.com/darbotlabs/DarbitNet.git
+   cd DarbitNet
+   ```
+
+2. **Run the automated setup script** as Administrator:
    ```powershell
    .\setup-bitnet.ps1
    ```
 
-2. **Validate the installation** by running the `validate_installation.ps1` script:
+3. **Validate the installation:**
    ```powershell
    .\validate_installation.ps1
    ```
 
-3. **Dependency Validation**:
-   - Verify that all required dependencies are installed and their versions are correct.
-   - Check for the presence of specific files or directories that indicate successful installation of dependencies.
-   - Validate the integrity of downloaded files by comparing checksums.
+### **Option 2: Manual Setup (Following the Game)**
+
+Follow the 6 rounds outlined above, executing each validation gate before proceeding to ensure your environment is properly configured.
+
+### **Common Issues & Solutions**
+
+1. **Missing submodules**: Ensure you clone with `--recursive` flag or run `git submodule update --init --recursive`
+2. **HuggingFace access**: Some models may require authentication - set `$Env:HF_TOKEN` with your access token
+3. **Build failures**: Ensure Visual Studio Build Tools are properly installed with C++ workload
+4. **Model download issues**: The setup_env.py script handles model download and quantization automatically
