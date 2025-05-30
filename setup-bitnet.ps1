@@ -1,5 +1,17 @@
 # Requires -RunAsAdministrator
 
+<#
+.SYNOPSIS
+Sets up the complete BitNet environment on Windows.
+
+.DESCRIPTION
+Installs the toolchain, configures Miniconda, builds bitnet.cpp and downloads
+the default model. Run from an elevated PowerShell prompt.
+
+.EXAMPLE
+pwsh -File .\setup-bitnet.ps1
+#>
+
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
@@ -122,3 +134,4 @@ try {
 } finally {
     Stop-Transcript
 }
+exit 0
